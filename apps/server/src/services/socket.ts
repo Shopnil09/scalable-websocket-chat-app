@@ -1,4 +1,19 @@
 import {Server} from 'socket.io'
+import Redis from 'ioredis'
+
+const pub = new Redis({
+  host: process.env.host,
+  port: process.env.port,
+  username: process.env.username,
+  password: process.env.password
+})
+
+const sub = new Redis({
+  host: process.env.host,
+  port: process.env.port,
+  username: process.env.username,
+  password: process.env.password
+})
 
 class SocketService { 
   private _io: Server // _io is the type server from socket.io
@@ -12,6 +27,9 @@ class SocketService {
         origin: '*'
       }
     })
+
+    // subscribing to the 'MESSAGES' channel to listen into whenever Redis publishes messages upon recieving
+    sub.subscribe("MESSAGES")
   }
 
   public initListeners() { 
@@ -22,7 +40,15 @@ class SocketService {
 
       socket.on('event:message', async ({message}:{message:string})=> {
         console.log("New Message Recv.", message)
+        await pub.publish("MESSAGES", JSON.stringify({message}))
       })
+    })
+
+    // listen for any messages that is published on the channel and check if it is MESSAGES channel, if it is, emit it to the connected users 
+    sub.on('message', (channel, message) => { 
+      if(channel === 'MESSAGES') { 
+        io.emit('message', message)
+      }
     })
   }
 
