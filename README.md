@@ -1,3 +1,11 @@
+# How to run the application
+
+- Install nvm and use the latest node version to properly install all packages
+- Replace the process.env.VARIABLE with your own endpoints to successfully run the application
+- cd into  my-turborepo and run yarn dev to run the application
+- To test out the functionalities, open the front-end client in multiple tabs and start ending messages to see it broadcast to others users connected to the same localhost endpoint
+
+
 # Turborepo starter
 
 This is an official starter Turborepo.
